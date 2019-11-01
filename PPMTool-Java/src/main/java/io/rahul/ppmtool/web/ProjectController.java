@@ -47,4 +47,12 @@ public class ProjectController {
     public Iterable<Project> getAllProjects() {
         return projectService.findAllProjects();
     }
+
+    @DeleteMapping("/{projectIdentifier}")
+    public ResponseEntity<?> deleteProject(@PathVariable String projectIdentifier) {
+
+        projectService.deleteProjectByIdentifier(projectIdentifier);
+
+        return new ResponseEntity<String>("Project with Identifier '" + projectIdentifier.toUpperCase() + "' was deleted", HttpStatus.OK);
+    }
 }
