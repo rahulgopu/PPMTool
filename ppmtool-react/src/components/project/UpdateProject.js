@@ -3,7 +3,6 @@ import { getProject, createProject } from "../../actions/projectActions";
 import PropTypes from "prop-types";
 import { connect } from "react-redux";
 import classnames from "classnames";
-import { GET_ERRORS } from "../../actions/types";
 
 class UpdateProject extends Component {
   constructor() {
