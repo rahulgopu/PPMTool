@@ -1,7 +1,9 @@
 package io.rahul.ppmtool.services;
 
+import io.rahul.ppmtool.domain.Backlog;
 import io.rahul.ppmtool.domain.Project;
 import io.rahul.ppmtool.exceptions.ProjectIdException;
+import io.rahul.ppmtool.repositories.BacklogRepository;
 import io.rahul.ppmtool.repositories.ProjectRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -12,9 +14,23 @@ public class ProjectService {
     @Autowired
     private ProjectRepository projectRepository;
 
+    @Autowired
+    private BacklogRepository backlogRepository;
+
     public Project saveOrUpdateProject(Project project) {
+        String requestIdentifier = project.getProjectIdentifier().toUpperCase();
         try{
-            project.setProjectIdentifier(project.getProjectIdentifier().toUpperCase());
+            project.setProjectIdentifier(requestIdentifier);
+            if(project.getId() == null) {
+                Backlog backlog = new Backlog();
+                project.setBacklog(backlog);
+                backlog.setProject(project);
+                backlog.setProjectIdentifier(requestIdentifier);
+            }
+
+            if(project.getId() != null) {
+                project.setBacklog(backlogRepository.findByProjectIdentifier(requestIdentifier));
+            }
             return projectRepository.save(project);
         }
         catch (Exception e) {
