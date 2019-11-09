@@ -5,7 +5,10 @@ import io.rahul.ppmtool.domain.ProjectTask;
 import io.rahul.ppmtool.repositories.BacklogRepository;
 import io.rahul.ppmtool.repositories.ProjectTaskRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
 public class ProjectTaskService {
@@ -46,5 +49,9 @@ public class ProjectTaskService {
         }
 
         return projectTaskRepository.save(projectTask);
+    }
+
+    public List<ProjectTask> findBacklogById(String backlog_id) {
+        return projectTaskRepository.findByProjectIdentifierOrderByPriority(backlog_id.toUpperCase());
     }
 }
