@@ -9,6 +9,7 @@ import javax.validation.constraints.Size;
 import java.util.Date;
 
 @Entity
+@Table(name = "project")
 public class Project {
 
     @Id
