@@ -11,6 +11,7 @@ import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.security.Principal;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -27,12 +28,12 @@ public class ProjectController {
     private ErrorValidationService errorValidationService;
 
     @PostMapping("")
-    public ResponseEntity<?> createNewProject(@Valid @RequestBody Project project, BindingResult result) {
+    public ResponseEntity<?> createNewProject(@Valid @RequestBody Project project, BindingResult result, Principal principal) {
 
         ResponseEntity<?> errorMap = errorValidationService.ErrorValidationService(result);
         if(errorMap != null) return errorMap;
         
-        projectService.saveOrUpdateProject(project);
+        projectService.saveOrUpdateProject(project, principal.getName());
         return new ResponseEntity<>(project, HttpStatus.CREATED);
     }
 
