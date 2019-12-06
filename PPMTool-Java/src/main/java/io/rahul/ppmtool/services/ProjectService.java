@@ -25,6 +25,17 @@ public class ProjectService {
 
     public Project saveOrUpdateProject(Project project, String username) {
         String requestIdentifier = project.getProjectIdentifier().toUpperCase();
+
+        if(project.getId() != null) {
+            Project existingProject = projectRepository.findByProjectIdentifier(project.getProjectIdentifier());
+
+            if(existingProject != null && (!existingProject.getProjectLeader().equals(username))) {
+                throw new ProjectNotFoundException("Project not found in your account");
+            } else if (existingProject == null) {
+                throw new ProjectNotFoundException("Project with ID '" + requestIdentifier + "' cannot be updated because it doesn't exist.");
+            }
+        }
+
         try{
             User user = userRepository.findByUsername(username);
             project.setUser(user);
@@ -45,7 +56,7 @@ public class ProjectService {
             return projectRepository.save(project);
         }
         catch (Exception e) {
-            throw new ProjectIdException("Project ID '" + project.getProjectIdentifier().toUpperCase() + "' already exists");
+            throw new ProjectIdException("Project ID '" + requestIdentifier + "' already exists");
         }
     }
 
