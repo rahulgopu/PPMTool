@@ -4,6 +4,7 @@ import io.rahul.ppmtool.domain.Backlog;
 import io.rahul.ppmtool.domain.Project;
 import io.rahul.ppmtool.domain.User;
 import io.rahul.ppmtool.exceptions.ProjectIdException;
+import io.rahul.ppmtool.exceptions.ProjectNotFoundException;
 import io.rahul.ppmtool.repositories.BacklogRepository;
 import io.rahul.ppmtool.repositories.ProjectRepository;
 import io.rahul.ppmtool.repositories.UserRepository;
@@ -48,27 +49,28 @@ public class ProjectService {
         }
     }
 
-    public Project findProjectByIdentifier(String projectIdentifier) {
+    public Project findProjectByIdentifier(String projectIdentifier, String username) {
 
+        //Only want to return the project if the user looking for it is the owner
         Project project = projectRepository.findByProjectIdentifier(projectIdentifier.toUpperCase());
 
         if (project == null) {
-            throw new ProjectIdException("Project does not exist");
+            throw new ProjectIdException("Project ID '" + projectIdentifier.toUpperCase() +"' does not exist");
         }
+
+        if(!project.getProjectLeader().equals(username)) {
+            throw new ProjectNotFoundException("Project not found in your account");
+        }
+
         return project;
     }
 
-    public Iterable<Project> findAllProjects() {
-        return projectRepository.findAll();
+    public Iterable<Project> findAllProjects(String username) {
+        return projectRepository.findAllByProjectLeader(username);
     }
 
-    public void deleteProjectByIdentifier(String projectIdentifier) {
-        Project project = projectRepository.findByProjectIdentifier(projectIdentifier.toUpperCase());
+    public void deleteProjectByIdentifier(String projectIdentifier, String username) {
 
-        if (project == null) {
-            throw new ProjectIdException("Cannot delete Project with ID '" + projectIdentifier + "' . This project does not exist");
-        }
-
-        projectRepository.delete(project);
+        projectRepository.delete(findProjectByIdentifier(projectIdentifier, username));
     }
 }
