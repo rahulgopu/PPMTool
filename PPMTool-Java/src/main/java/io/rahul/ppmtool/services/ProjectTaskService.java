@@ -25,11 +25,14 @@ public class ProjectTaskService {
     @Autowired
     private ProjectRepository projectRepository;
 
-    public ProjectTask addProjectTask(String projectIdentifier, ProjectTask projectTask) {
+    @Autowired
+    private ProjectService projectService;
 
-        try {
+    public ProjectTask addProjectTask(String projectIdentifier, ProjectTask projectTask, String username) {
+
+
             //PTs to be added to a specific project, project!= null, BL exists
-            Backlog backlog = backlogRepository.findByProjectIdentifier(projectIdentifier);
+            Backlog backlog = projectService.findProjectByIdentifier(projectIdentifier, username).getBacklog(); //backlogRepository.findByProjectIdentifier(projectIdentifier);
 
             //set the BL to PT
             projectTask.setBacklog(backlog);
@@ -46,7 +49,7 @@ public class ProjectTaskService {
             projectTask.setProjectIdentifier(projectIdentifier);
 
             //Initial priority when priority is null
-            if(projectTask.getPriority() == 0 || projectTask.getPriority() == null) {
+            if(projectTask.getPriority() == null || projectTask.getPriority() == 0) {
                 projectTask.setPriority(3);
             }
 
@@ -56,18 +59,11 @@ public class ProjectTaskService {
             }
 
             return projectTaskRepository.save(projectTask);
-        }catch (Exception e) {
-            throw new ProjectNotFoundException("Project Not Found");
-        }
     }
 
-    public List<ProjectTask> findBacklogById(String backlog_id) {
+    public List<ProjectTask> findBacklogById(String backlog_id, String username) {
 
-        Project project = projectRepository.findByProjectIdentifier(backlog_id);
-
-        if (project == null) {
-            throw new ProjectNotFoundException("Project with ID: '" + backlog_id.toUpperCase() + "' does not exist.");
-        }
+        projectService.findProjectByIdentifier(backlog_id, username);
         return projectTaskRepository.findByProjectIdentifierOrderByPriority(backlog_id.toUpperCase());
     }
 
