@@ -1,6 +1,43 @@
 import React, { Component } from "react";
+import { createNewUser } from "../../actions/securityActions";
+import PropTypes from "prop-types";
+import { connect } from "react-redux";
+import classnames from "classnames";
 
 class Register extends Component {
+  constructor() {
+    super();
+    this.state = {
+      username: "",
+      fullName: "",
+      password: "",
+      confirmPassword: "",
+      errors: {}
+    };
+
+    this.handleChange = this.handleChange.bind(this);
+    this.handleSubmit = this.handleSubmit.bind(this);
+  }
+
+  handleChange(event) {
+    const { name, value } = event.target;
+
+    this.setState({
+      [name]: value
+    });
+  }
+
+  handleSubmit(event) {
+    event.preventDefault();
+    const newUser = {
+      username: this.state.username,
+      fullName: this.state.fullName,
+      password: this.state.password,
+      confirmPassword: this.state.confirmPassword
+    };
+    this.props.createNewUser(newUser, this.props.history);
+  }
+
   render() {
     return (
       <div className="register">
@@ -9,22 +46,25 @@ class Register extends Component {
             <div className="col-md-8 m-auto">
               <h1 className="display-4 text-center">Sign Up</h1>
               <p className="lead text-center">Create your Account</p>
-              <form action="create-profile.html">
+              <form onSubmit={this.handleSubmit}>
                 <div className="form-group">
                   <input
                     type="text"
                     className="form-control form-control-lg"
-                    placeholder="Name"
-                    name="name"
-                    required
+                    placeholder="Full Name"
+                    name="fullName"
+                    value={this.state.fullName}
+                    onChange={this.handleChange}
                   />
                 </div>
                 <div className="form-group">
                   <input
-                    type="email"
+                    type="text"
                     className="form-control form-control-lg"
-                    placeholder="Email Address"
-                    name="email"
+                    placeholder="Email Address (Username)"
+                    name="username"
+                    value={this.state.username}
+                    onChange={this.handleChange}
                   />
                 </div>
                 <div className="form-group">
@@ -33,6 +73,8 @@ class Register extends Component {
                     className="form-control form-control-lg"
                     placeholder="Password"
                     name="password"
+                    value={this.state.password}
+                    onChange={this.handleChange}
                   />
                 </div>
                 <div className="form-group">
@@ -40,7 +82,9 @@ class Register extends Component {
                     type="password"
                     className="form-control form-control-lg"
                     placeholder="Confirm Password"
-                    name="password2"
+                    name="confirmPassword"
+                    value={this.state.confirmPassword}
+                    onChange={this.handleChange}
                   />
                 </div>
                 <input type="submit" className="btn btn-info btn-block mt-4" />
@@ -53,4 +97,13 @@ class Register extends Component {
   }
 }
 
-export default Register;
+Register.propTypes = {
+  createNewUser: PropTypes.func.isRequired,
+  errors: PropTypes.object.isRequired
+};
+
+const mapStateToProps = state => ({
+  errors: state.errors
+});
+
+export default connect(mapStateToProps, { createNewUser })(Register);
